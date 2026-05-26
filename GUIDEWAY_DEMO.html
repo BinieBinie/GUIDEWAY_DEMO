@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUIDEWAY - 나를 위한 똑똑한 길잡이</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #F7F9FC;
+            --card-bg: #FFFFFF;
+            --primary: #7C4DFF;
+            --primary-light: #EDE7F6;
+            --accent: #FF8A8A;
+            --mint: #69F0AE;
+            --text-main: #2D3748;
+            --text-sub: #718096;
+            --border-radius: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* 스마트폰 목업 스타일 */
+        .phone-mockup {
+            width: 390px;
+            height: 844px;
+            background: var(--card-bg);
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(124, 77, 255, 0.12);
+            border: 8px solid #2D3748;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 상단 상태바 */
+        .status-bar {
+            height: 40px;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-main);
+            background: var(--card-bg);
+        }
+
+        /* 헤더 영역 */
+        header {
+            padding: 10px 24px 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .profile-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary);
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .profile-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* 메인 컨텐츠 영역 */
+        .content {
+            flex: 1;
+            padding: 0 24px 15px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        /* 탭 화면 제어 */
+        .tab-panel {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            height: 100%;
+        }
+
+        .tab-panel.active {
+            display: flex;
+        }
+
+        /* 1. 목표 입력 섹션 */
+        .input-section {
+            background: var(--primary-light);
+            padding: 18px;
+            border-radius: var(--border-radius);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .text-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            background: white;
+            font-size: 14px;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .text-input:focus {
+            border-color: var(--primary);
+        }
+
+        select {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            background: white;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .ai-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 2. ONE-STEP VIEW */
+        .one-step-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #FFFBF0;
+            border: 3px dashed #FFE082;
+            border-radius: var(--border-radius);
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+        .badge {
+            background: #FFB300;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .current-task-icon {
+            font-size: 44px;
+            color: #FFB300;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .current-task-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.4;
+            margin-bottom: 20px;
+            word-break: keep-all;
+        }
+
+        /* 타임 바 */
+        .time-bar-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .time-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+        }
+
+        .time-bar-bg {
+            width: 100%;
+            height: 14px;
+            background: #E2E8F0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .time-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #FF8A8A, #FF5252);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            min-height: 10px;
+            border-radius: 50%;
+            background: #CBD5E0;
+        }
+
+        .dot.active { background: var(--primary); transform: scale(1.2); }
+        .dot.completed { background: var(--mint); }
+
+        .next-btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(124, 77, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 📍 TAB 2: AI 경로 추천 스타일 */
+        .route-card {
+            background: #F0F4FF;
+            border: 2px solid #C4D7FF;
+            padding: 16px;
+            border-radius: var(--border-radius);
+        }
+        .route-title {
+            font-weight: 700; color: #3B82F6; font-size: 15px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .timeline {
+            position: relative; padding-left: 24px; display: flex; flex-direction: column; gap: 15px;
+        }
+        .timeline::before {
+            content: ''; position: absolute; left: 7px; top: 5px; bottom: 5px; width: 3px; background: #C4D7FF;
+        }
+        .timeline-node {
+            position: relative; font-size: 14px; font-weight: bold; color: var(--text-main);
+        }
+        .timeline-node::before {
+            content: ''; position: absolute; left: -21px; top: 4px; width: 11px; height: 11px; background: #3B82F6; border-radius: 50%;
+        }
+        .timeline-node.done { color: var(--text-sub); }
+        .timeline-node.done::before { background: var(--mint); }
+        .route-hint {
+            background: #FFF; padding: 12px; border-radius: 14px; font-size: 13px; color: var(--text-sub); border: 1px solid #E2E8F0;
+        }
+
+        /* 📈 TAB 3: 나의 성장 스타일 */
+        .growth-score-card {
+            background: #F0FDF4; border: 2px solid #BBF7D0; padding: 20px; border-radius: var(--border-radius); text-align: center;
+        }
+        .plant-box { font-size: 60px; margin: 10px 0; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-item { background: #F8FAFC; padding: 15px; border-radius: 16px; text-align: center; border: 1px solid #E2E8F0; }
+        .stat-num { font-size: 20px; font-weight: 700; color: var(--primary); margin-top: 5px; }
+
+        /* 하단 탭 바 */
+        nav {
+            height: 70px;
+            border-top: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: white;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-sub);
+            font-size: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+        }
+
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 20px; }
+
+        /* 👤 새로 추가된 프로필 모달 팝업 스타일 */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(45, 55, 72, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 100;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-content {
+            width: 100%;
+            background: white;
+            border-radius: 32px 32px 0 0;
+            padding: 30px 24px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title {
+            font-size: 18px; font-weight: 700; color: var(--text-main);
+        }
+        .close-btn {
+            background: none; border: none; font-size: 20px; color: var(--text-sub); cursor: pointer;
+        }
+        .profile-avatar-area {
+            display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 5px;
+        }
+        .profile-avatar {
+            width: 70px; height: 70px; background: var(--primary-light); color: var(--primary);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 32px;
+        }
+        .form-group {
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .form-label {
+            font-size: 13px; font-weight: 700; color: var(--text-sub);
+        }
+        .form-input {
+            padding: 12px; border-radius: 14px; border: 2px solid #E2E8F0; font-size: 14px; font-weight: bold; outline: none;
+        }
+        .form-input:focus { border-color: var(--primary); }
+        .save-btn {
+            background: var(--primary); color: white; border: none; padding: 14px; border-radius: 16px;
+            font-size: 15px; font-weight: 700; cursor: pointer; text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-mockup">
+        <div class="status-bar">
+            <span id="statusBarName">민우 님</span>
+            <div>
+                <i class="fa-solid fa-wifi" style="margin-right: 5px;"></i>
+                <i class="fa-solid fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <header>
+            <div class="logo">GUIDEWAY</div>
+            <button class="profile-btn" onclick="openProfileModal()"><i class="fa-solid fa-user"></i></button>
+        </header>
+
+        <div class="content">
+            
+            <div id="tab-action" class="tab-panel active">
+                <div class="input-section">
+                    <div class="input-title">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 할 일 선택하기
+                    </div>
+                    <div class="input-box">
+                        <select id="goalSelect" onchange="changeGoal()"></select>
+                    </div>
+                    <div class="input-title" style="margin-top: 5px;">
+                        <i class="fa-solid fa-plus"></i> 새 목표 직접 추가 (AI 자동분할)
+                    </div>
+                    <div class="input-box">
+                        <input type="text" id="customGoalInput" class="text-input" placeholder="예: 우체국 택배 보내기">
+                        <button class="ai-btn" onclick="addCustomGoal()">추가</button>
+                    </div>
+                </div>
+
+                <div class="one-step-container">
+                    <div class="badge" id="currentStepBadge">로딩 중...</div>
+                    <div class="current-task-icon" id="taskIcon"><i class="fa-solid fa-spinner"></i></div>
+                    <div class="current-task-text" id="taskInstruction">목표를 선택해 주세요.</div>
+
+                    <div class="progress-dots" id="dotsContainer"></div>
+
+                    <div class="time-bar-container">
+                        <div class="time-bar-label">
+                            <span><i class="fa-regular fa-clock"></i> 남은 시간</span>
+                            <span id="timeLabel" style="color: var(--accent);">계산 중</span>
+                        </div>
+                        <div class="time-bar-bg">
+                            <div class="time-bar-fill" id="timeBar"></div>
+                        </div>
+                    </div>
+
+                    <button class="next-btn" onclick="nextStep()">
+                        <span>해냈어요! 다음 단계로</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="tab-route" class="tab-panel">
+                <div class="route-card">
+                    <div class="route-title">
+                        <i class="fa-solid fa-map-location-dot"></i> 위치 및 동선 최적화 경로
+                    </div>
+                    <div class="timeline" id="aiRouteTimeline"></div>
+                </div>
+                <div class="route-hint">
+                    <i class="fa-solid fa-lightbulb" style="color: #EAB308;"></i> 
+                    <strong>AI 안내:</strong> 현재 위치 주변 동선과 마감 시간을 분석해 조율한 최적의 순서입니다.
+                </div>
+            </div>
+
+            <div id="tab-growth" class="tab-panel">
+                <div class="growth-score-card">
+                    <h3>나의 마음 새싹</h3>
+                    <div class="plant-box" id="plantEmoji">🌱</div>
+                    <p id="growthLevelText" style="font-weight: bold; color: #16A34A;">Lv.1 아기 새싹</p>
+                </div>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div style="font-size: 13px; color: var(--text-sub);">완료한 총 행동</div>
+                        <div class="stat-num" id="totalDoneCount">0개</div>
+                    </div>
+                    <div class="stat-item">
+                        <div style="font-size: 13px; color: var(--text-sub);">연속 성공 일수</div>
+                        <div class="stat-num">3일차 🔥</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <nav>
+            <div class="nav-item active" onclick="switchTab('action', this)">
+                <i class="fa-solid fa-house-user"></i>
+                <span>오늘의 행동</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('route', this)">
+                <i class="fa-solid fa-route"></i>
+                <span>AI 경로</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('growth', this)">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>나의 성장</span>
+            </div>
+        </nav>
+
+        <div class="modal-overlay" id="profileModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">나의 길잡이 설정</span>
+                    <button class="close-btn" onclick="closeProfileModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                
+                <div class="profile-avatar-area">
+                    <div class="profile-avatar"><i class="fa-solid fa-smile-wink"></i></div>
+                    <div style="font-weight: bold; font-size: 14px; color: var(--primary);">스마트 인지 모드 작동 중</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">나의 이름</label>
+                    <input type="text" id="userNameInput" class="form-input" value="민우">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">안내 속도 설정</label>
+                    <select id="userSpeedSelect">
+                        <option value="slow">천천히 여유롭게 지시 (추천)</option>
+                        <option value="normal" selected>보통 속도로 지시</option>
+                        <option value="fast">빠르게 핵심만 지시</option>
+                    </select>
+                </div>
+
+                <button class="save-btn" onclick="saveProfile()">설정 저장하기</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. 확장된 시나리오 데이터베이스 (초기값)
+        const scenarios = {
+            bank: {
+                title: "🏦 은행 가기",
+                steps: [
+                    { text: "지갑 속에 신분증을 꼭 챙기세요", icon: "fa-id-card", barWidth: "100%", status: "pending" },
+                    { text: "정류장으로 이동해서 104번 버스를 타세요", icon: "fa-bus", barWidth: "75%", status: "pending" },
+                    { text: "은행 입구 안쪽에서 번호표를 뽑으세요", icon: "fa-ticket", barWidth: "50%", status: "pending" },
+                    { text: "딩동 소리가 나면 번호 창구로 가세요", icon: "fa-comments", barWidth: "25%", status: "pending" }
+                ]
+            },
+            clean: {
+                title: "🧹 방 청소하기",
+                steps: [
+                    { text: "큰 쓰레기들을 모아 종량제 봉투에 넣으세요", icon: "fa-trash", barWidth: "100%", status: "pending" },
+                    { text: "책상 위 흩어진 책들을 책꽂이에 꽂으세요", icon: "fa-book", barWidth: "66%", status: "pending" },
+                    { text: "밀대걸레를 꺼내 거실과 방 바닥을 닦으세요", icon: "fa-broom", barWidth: "33%", status: "pending" }
+                ]
+            },
+            homework: {
+                title: "📝 과제 제출하기",
+                steps: [
+                    { text: "컴퓨터를 켜고 학교 홈페이지에 접속하세요", icon: "fa-desktop", barWidth: "100%", status: "pending" },
+                    { text: "바탕화면에서 '최종과제.docx' 파일을 고르세요", icon: "fa-file-word", barWidth: "50%", status: "pending" },
+                    { text: "제출 단추를 누르고 완료 창이 떴는지 보세요", icon: "fa-cloud-arrow-up", barWidth: "25%", status: "pending" }
+                ]
+            }
+        };
+
+        let currentGoal = "bank";
+        let currentStep = 0;
+        let totalCompletedActions = 0; 
+        let userName = "민우"; // 기본 사용자 이름 선언
+
+        // 2. 초기 렌더링 셀렉트박스 세팅
+        function initGoalSelect() {
+            const select = document.getElementById("goalSelect");
+            select.innerHTML = "";
+            for (let key in scenarios) {
+                let opt = document.createElement("option");
+                opt.value = key;
+                opt.innerText = scenarios[key].title;
+                if(key === currentGoal) opt.selected = true;
+                select.appendChild(opt);
+            }
+            // 상단바 초기 이름 주입
+            document.getElementById("statusBarName").innerText = `${userName} 님`;
+        }
+
+        // 3. 사용자가 새로운 목표를 입력했을 때 AI 규칙기반 자동분할 로직
+        function addCustomGoal() {
+            const input = document.getElementById("customGoalInput");
+            const text = input.value.trim();
+            
+            if(!text) {
+                alert("목표를 입력해주세요!");
+                return;
+            }
+
+            const newKey = "custom_" + Date.now();
+            let generatedSteps = [];
+            if(text.includes("택배") || text.includes("우체국") || text.includes("보내기")) {
+                generatedSteps = [
+                    { text: "상자에 물건을 넣고 테이프로 단단히 붙이세요", icon: "fa-box-open", barWidth: "100%", status: "pending" },
+                    { text: "상자 위에 받는 사람 주소를 정자체로 쓰세요", icon: "fa-pen", barWidth: "70%", status: "pending" },
+                    { text: "우체국이나 편의점에 방문해 접수처로 가세요", icon: "fa-store", barWidth: "40%", status: "pending" }
+                ];
+            } else if(text.includes("밥") || text.includes("요리") || text.includes("먹기")) {
+                generatedSteps = [
+                    { text: "냉장고를 열어 요리할 재료들을 식탁에 꺼내세요", icon: "fa-ice-cream", barWidth: "100%", status: "pending" },
+                    { text: "가스레인지나 인덕션을 켜고 안전하게 조리하세요", icon: "fa-fire-burner", barWidth: "50%", status: "pending" },
+                    { text: "그릇에 담아 꼭꼭 씹어 맛있게 식사하세요", icon: "fa-utensils", barWidth: "25%", status: "pending" }
+                ];
+            } else {
+                generatedSteps = [
+                    { text: `${text} 수행에 필요한 준비물을 책상에 챙기세요`, icon: "fa-clipboard-list", barWidth: "100%", status: "pending" },
+                    { text: "방해되는 스마트폰 알림을 끄고 시작하세요", icon: "fa-phone-slash", barWidth: "66%", status: "pending" },
+                    { text: `집중해서 ${text} 핵심 행동을 마무리하세요`, icon: "fa-star", barWidth: "33%", status: "pending" }
+                ];
+            }
+
+            scenarios[newKey] = {
+                title: "✨ " + text,
+                steps: generatedSteps
+            };
+
+            currentGoal = newKey;
+            currentStep = 0;
+            input.value = "";
+            
+            initGoalSelect();
+            updateUI();
+            alert(`💡 생성형 AI가 '${text}' 목표를 ${generatedSteps.length}단계 실제 행동으로 세분화했습니다!`);
+        }
+
+        function changeGoal() {
+            currentGoal = document.getElementById("goalSelect").value;
+            currentStep = 0;
+            updateUI();
+        }
+
+        // 4. One-Step 다음 버튼 동작 및 성장 스코어 연동
+        function nextStep() {
+            const currentScenario = scenarios[currentGoal];
+            const maxStep = currentScenario.steps.length;
+
+            currentScenario.steps[currentStep].status = "completed";
+            totalCompletedActions++;
+
+            if (currentStep < maxStep - 1) {
+                currentStep++;
+                updateUI();
+            } else {
+                alert(`🎉 대단해요, ${userName} 님! '${currentScenario.title}' 목표의 모든 단계를 완수했습니다!`);
+                currentStep = 0;
+                currentScenario.steps.forEach(s => s.status = "pending");
+                updateUI();
+            }
+        }
+
+        // 5. 대화형 화면 탭 전환 기능
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('nav .nav-item').forEach(item => item.classList.remove('active'));
+
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            element.classList.add('active');
+
+            if(tabId === 'route') renderAIRoute();
+            if(tabId === 'growth') renderGrowth();
+        }
+
+        // 📍 AI 경로 탭 동적 렌더링
+        function renderAIRoute() {
+            const timeline = document.getElementById("aiRouteTimeline");
+            timeline.innerHTML = "";
+
+            for (let key in scenarios) {
+                const goal = scenarios[key];
+                const node = document.createElement("div");
+                node.classList.add("timeline-node");
+                
+                const isAllDone = goal.steps.every(s => s.status === "completed");
+                if (isAllDone) node.classList.add("done");
+
+                const isCurrent = (key === currentGoal) ? " <span style='color:var(--primary); font-size:11px;'>(진행중)</span>" : "";
+
+                node.innerHTML = `${goal.title} ${isCurrent}<div style='font-size:12px; font-weight:normal; color:var(--text-sub); margin-top:2px;'>AI 배정 가이드 단위: ${goal.steps.length}단계 행동 지침</div>`;
+                timeline.appendChild(node);
+            }
+        }
+
+        // 📈 나의 성장 탭 동적 렌더링
+        function renderGrowth() {
+            document.getElementById("totalDoneCount").innerText = `${totalCompletedActions}개`;
+            
+            const emoji = document.getElementById("plantEmoji");
+            const text = document.getElementById("growthLevelText");
+
+            if(totalCompletedActions >= 10) {
+                emoji.innerText = "🌳";
+                text.innerText = "Lv.4 울창한 큰 나무";
+                text.style.color = "#15803d";
+            } else if(totalCompletedActions >= 6) {
+                emoji.innerText = "🌿";
+                text.innerText = "Lv.3 푸른 청년 잎새";
+                text.style.color = "#16a34a";
+            } else if(totalCompletedActions >= 3) {
+                emoji.innerText = "🌱";
+                text.innerText = "Lv.2 무럭무럭 새싹";
+                text.style.color = "#22c55e";
+            } else {
+                emoji.innerHTML = "<i class='fa-solid fa-seedling' style='color:#86EFAC;'></i>";
+                text.innerText = "Lv.1 아기 씨앗 단계";
+                text.style.color = "#4ade80";
+            }
+        }
+
+        // 🏠 UI 새로고침 메인 함수
+        function updateUI() {
+            const steps = scenarios[currentGoal].steps;
+            const stepData = steps[currentStep];
+
+            document.getElementById("taskInstruction").innerText = stepData.text;
+            document.getElementById("taskIcon").innerHTML = `<i class="fa-solid ${stepData.icon}"></i>`;
+            document.getElementById("currentStepBadge").innerText = `총 ${steps.length}단계 중 ${currentStep + 1}단계`;
+            
+            document.getElementById("timeBar").style.width = stepData.barWidth;
+
+            const label = document.getElementById("timeLabel");
+            if(parseInt(stepData.barWidth) > 70) {
+                label.innerText = "여유로움";
+                label.style.color = "var(--mint)";
+            } else if(parseInt(stepData.barWidth) > 40) {
+                label.innerText = "보통 속도";
+                label.style.color = "#F59E0B";
+            } else {
+                label.innerText = "서두르세요";
+                label.style.color = "var(--accent)";
+            }
+
+            const dotsContainer = document.getElementById("dotsContainer");
+            dotsContainer.innerHTML = "";
+            for (let i = 0; i < steps.length; i++) {
+                const dot = document.createElement("div");
+                dot.classList.add("dot");
+                if (i === currentStep) dot.classList.add("active");
+                if (steps[i].status === "completed") dot.classList.add("completed");
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        // 👤 새로 추가된 프로필 모달 제어 함수들
+        function openProfileModal() {
+            document.getElementById("profileModal").classList.add("open");
+        }
+
+        function closeProfileModal() {
+            document.getElementById("profileModal").classList.remove("open");
+        }
+
+        function saveProfile() {
+            const inputVal = document.getElementById("userNameInput").value.trim();
+            if(!inputVal) {
+                alert("이름을 입력해 주세요!");
+                return;
+            }
+            
+            // 이름 데이터 업데이트 및 연동
+            userName = inputVal;
+            document.getElementById("statusBarName").innerText = `${userName} 님`;
+            
+            alert(`⚙️ 설정이 완료되었습니다! 든든한 조력자 AI가 이제 ${userName} 님의 페이스에 맞춥니다.`);
+            closeProfileModal();
+        }
+        
+        // 애플리케이션 최초 로드
+        initGoalSelect();
+        updateUI();
+    </script>
+</body>
+</html>
